@@ -3,6 +3,6 @@ module Dripper
     validates :drippable, presence: true
     belongs_to :drippable, polymorphic: true
 
-    belongs_to :action
+    belongs_to :dripper_action, class_name: "Dripper::Action"
   end
 end
