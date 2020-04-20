@@ -1,4 +1,4 @@
-class CreateDripperMessages < ActiveRecord::Migration
+class CreateDripperMessages < ActiveRecord::Migration[5.2]
   def change
     create_table :dripper_messages do |t|
       t.references :drippable, polymorphic: true, index: true, null: false
