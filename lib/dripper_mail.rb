@@ -80,9 +80,10 @@ class DripperProxy
     all_recs = self.model.to_s.classify.constantize.send(:all)
 
       # only send if we haven't already
+      binding.pry if Rails.env.test?
     already_sent = Dripper::Message
-      .where(drippable_type: self.model.to_s.classify.to_s, dripper_action_id: dripper_action.id)
-      .select(:drippable_id)
+      .where(drippable_type: self.model.to_s.classify.to_s, dripper_action_id: dripper_action.id.to_s)
+      .select(:drippable_id).map(&:to_s)
 
     final_scope = all_recs
       .where.not(id: already_sent)
@@ -106,6 +107,7 @@ class DripperProxy
     dripper_action = Dripper::Action.find_by(action: self.action.to_s, mailer: self.mailer.to_s)
     scoped_recs(item).each do |obj|
 
+      #binding.pry if Rails.env.test?
       # instantiate the mailer and run the code
       mailer_obj = self.mailer.to_s.classify.constantize
       mail_obj = mailer_obj.send self.action, obj
@@ -127,7 +129,6 @@ class DripperProxy
         else
           mail_obj.deliver_now
         end
-
         # insert a row
         Dripper::Message.create!(dripper_action_id: dripper_action.id, drippable: obj)
       end
